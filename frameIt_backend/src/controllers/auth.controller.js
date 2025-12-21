@@ -9,6 +9,7 @@ import {
   logOutUserService,
 } from "../services/auth.service.js";
 
+const isProd = process.env.NODE_ENV === "production";
 //register user
 const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password, rememberMe } = req.body;
@@ -25,14 +26,14 @@ const registerUser = asyncHandler(async (req, res) => {
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
   });
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
     ...(rememberMe && { maxAge: 7 * 24 * 60 * 1000 }),
   });
 
@@ -65,14 +66,14 @@ const loginUser = asyncHandler(async (req, res) => {
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
   });
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
     ...(rememberMe && { maxAge: 7 * 24 * 60 * 60 * 1000 }),
   });
 
@@ -97,13 +98,13 @@ const logoutUser = asyncHandler(async (req, res) => {
 
   res.clearCookie("refreshToken", {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
   });
   res.clearCookie("accessToken", {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
   });
 
   res.status(200).json(new ApiResponse(200, "logout successfull", null));
@@ -121,16 +122,15 @@ const refresh = asyncHandler(async (req, res) => {
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false, // true in production
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
     maxAge: 20 * 60 * 1000,
   });
 
   res.cookie("refreshToken", newRefreshToken, {
     httpOnly: true,
-    sameSite: "strict",
-    secure: false, // true in production
-    lax: true,
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
