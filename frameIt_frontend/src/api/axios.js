@@ -1,7 +1,8 @@
 import axios from "axios";
 
+const baseURL = "https://frameit-go92.onrender.com/api";
 const api = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL: baseURL || "http://localhost:3000/api",
   withCredentials: true,
 });
 
