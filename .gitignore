@@ -1,0 +1,18 @@
+
+# Node stuff
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+frameIt_frontend/.env
+frameIt_backend/.env
+
+# Build outputs
+frameIt_frontend/build/
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
