@@ -22,8 +22,17 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: allowedOrigins,
-    credentials: true,
+    origin: function (origin, callback) {
+      // allow requests with no origin (like Postman)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg =
+          "The CORS policy for this site does not allow access from the specified Origin.";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+    credentials: true, // allow cookies
   })
 );
 app.use(globalRateLimiter);
