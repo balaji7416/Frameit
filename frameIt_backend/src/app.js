@@ -15,19 +15,20 @@ import ApiError from "./utils/api-error.js";
 const app = express();
 
 const allowedOrigins = [
-  "https://frameitfrontend.vercel.app",
+  "https://frameit-frontend.onrender.com",
   "http://localhost:5173",
   "http://localhost:10000",
 ];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // Postman etc
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true); // Postman, curl
+
       if (allowedOrigins.includes(origin)) {
-        callback(null, origin); // <— MUST return the origin string, not `true`
+        callback(null, true);
       } else {
-        callback(new Error("CORS not allowed"));
+        callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
