@@ -15,7 +15,7 @@ import ApiError from "./utils/api-error.js";
 const app = express();
 
 const allowedOrigins = [
-  "https://frameit-frontend.onrender.com",
+  "https://frameitfrontend.vercel.app",
   "http://localhost:5173",
   "http://localhost:10000",
 ];
