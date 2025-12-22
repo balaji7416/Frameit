@@ -9,12 +9,14 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "start": "vite preview"
+    "start": "node server.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.2",
     "clsx": "^2.1.1",
+    "express": "^5.2.1",
+    "http-proxy-middleware": "^3.0.5",
     "line-clamp": "^1.0.0",
     "lucide-react": "^0.561.0",
     "react": "^19.2.0",

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = "https://frameit-go92.onrender.com/api";
+const baseURL = "https://frameit-jnsz.onrender.com/api";
 
 const api = axios.create({
   baseURL: baseURL,
