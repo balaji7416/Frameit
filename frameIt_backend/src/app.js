@@ -23,18 +23,17 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (like Postman)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          "The CORS policy for this site does not allow access from the specified Origin.";
-        return callback(new Error(msg), false);
+      if (!origin) return callback(null, true); // Postman etc
+      if (allowedOrigins.includes(origin)) {
+        callback(null, origin); // <— MUST return the origin string, not `true`
+      } else {
+        callback(new Error("CORS not allowed"));
       }
-      return callback(null, true);
     },
-    credentials: true, // allow cookies
+    credentials: true,
   })
 );
+
 app.use(globalRateLimiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
