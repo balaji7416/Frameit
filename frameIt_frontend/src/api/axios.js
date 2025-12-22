@@ -4,7 +4,7 @@ const baseURL =
   import.meta.env.VITE_API_URL || "https://frameit-jnsz.onrender.com/api";
 
 const api = axios.create({
-  baseURL: baseURL,
+  baseURL: "/api", // for proxy to work so that cookies are sent even in cross-origin requests
   withCredentials: true,
 });
 
