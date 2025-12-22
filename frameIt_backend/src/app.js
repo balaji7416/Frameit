@@ -18,15 +18,10 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://frameit-frontend.onrender.com",
 ];
+
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: allowedOrigins,
     credentials: true,
   })
 );
