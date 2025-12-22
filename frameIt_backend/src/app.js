@@ -16,7 +16,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
-  " https://frameit-go92.onrender.com",
+  "https://frameit-frontend.onrender.com",
 ];
 app.use(
   cors({
