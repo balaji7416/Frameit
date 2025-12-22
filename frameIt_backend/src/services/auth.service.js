@@ -109,6 +109,8 @@ const loginUserService = async (email, password) => {
 const refreshTokenService = async (refreshToken) => {
   try {
     // hash refresh token and find user with that token hash
+
+    console.log("refreshToken:", refreshToken);
     const tokenIdHash = await crypto
       .createHash("sha256")
       .update(refreshToken)

@@ -15,8 +15,8 @@ import ApiError from "./utils/api-error.js";
 const app = express();
 
 const allowedOrigins = [
-  "http://localhost:5173",
   "https://frameit-frontend.onrender.com",
+  "http://localhost:5173",
 ];
 
 app.use(
