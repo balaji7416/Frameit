@@ -9,7 +9,7 @@ import {
   logOutUserService,
 } from "../services/auth.service.js";
 
-const isProd = true; // process.env.NODE_ENV === "production";
+const isProd = process.env.NODE_ENV === "production";
 const cookieOptions = {
   httpOnly: true,
   secure: isProd,

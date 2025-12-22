@@ -4,7 +4,7 @@ const baseURL =
   import.meta.env.VITE_API_URL || "https://frameit-jnsz.onrender.com/api";
 
 const api = axios.create({
-  baseURL: baseURL,
+  baseURL: "http://localhost:3000/api",
   withCredentials: true,
 });
 
