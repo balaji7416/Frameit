@@ -55,27 +55,23 @@ export default function Gallery({ posts, loading, isOwner, setPosts }) {
       className="flex gap-4"
       columnClassName="masonry-grid_column"
     >
-      {loading
-        ? Array.from({ length: 8 }).map((_, index) => (
-            <Card key={`skeleton-${index}`} loading />
-          ))
-        : posts.map((post) => (
-            <Card
-              _id={post._id}
-              key={post._id}
-              img_url={post.image}
-              title={post.content}
-              loading={loading}
-              isOwner={isOwner}
-              isOpen={openMenuId === post._id}
-              onToggle={() =>
-                setOpenMenuId(openMenuId === post._id ? null : post._id)
-              }
-              onDelete={() => handleDelete(post._id)}
-              onDownload={() => handleDownload(post.image, `${post._id}.jpg`)}
-              downloadLoading={downloadLoading}
-            />
-          ))}
+      {(loading ? Array.from({ length: 10 }) : posts).map((post, idx) => (
+        <Card
+          _id={post?._id}
+          key={post?._id || idx}
+          img_url={post?.image}
+          title={post?.content}
+          loading={loading}
+          isOwner={isOwner}
+          isOpen={openMenuId === post?._id}
+          onToggle={() =>
+            setOpenMenuId(openMenuId === post?._id ? null : post?._id)
+          }
+          onDelete={() => handleDelete(post?._id)}
+          onDownload={() => handleDownload(post?.image, `${post?._id}.jpg`)}
+          downloadLoading={downloadLoading}
+        />
+      ))}
     </Masonry>
   );
 }

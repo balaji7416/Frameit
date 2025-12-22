@@ -1,38 +1,68 @@
 import axios from "axios";
 
 const baseURL = "https://frameit-go92.onrender.com/api";
+
 const api = axios.create({
   baseURL: baseURL || "http://localhost:3000/api",
   withCredentials: true,
 });
 
-const max_tries = 2;
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error) => {
+  failedQueue.forEach((promise) => {
+    if (error) promise.reject(error);
+    else promise.resolve();
+  });
+  failedQueue = [];
+};
 
 api.interceptors.response.use(
-  (res) => res,
-  async (err) => {
-    const original_request = err.config;
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
 
-    if (original_request.url.includes("/auth/refresh")) {
-      return Promise.reject(err);
+    // If refresh itself failed → game over
+    if (originalRequest.url.includes("/auth/refresh")) {
+      return Promise.reject(error);
     }
 
-    original_request._retryCount = original_request._retryCount || 0;
+    // f already retried once, don't loop
+    if (originalRequest._retry) {
+      return Promise.reject(error);
+    }
 
-    if (
-      err.response?.status === 401 &&
-      original_request._retryCount < max_tries
-    ) {
-      original_request._retryCount += 1;
+    // Only care about 401s
+    if (error.response?.status === 401) {
+      // If refresh already running → queue this request
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({
+            resolve: () => resolve(api(originalRequest)),
+            reject,
+          });
+        });
+      }
+
+      // Start refresh flow
+      originalRequest._retry = true;
+      isRefreshing = true;
+
       try {
+        console.log("refreshing token....");
         await api.post("/auth/refresh");
-        return api(original_request);
-      } catch (refresh_err) {
-        return Promise.reject(refresh_err);
+        processQueue(null);
+        return api(originalRequest);
+      } catch (err) {
+        processQueue(err);
+        return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
       }
     }
 
-    return Promise.reject(err);
+    return Promise.reject(error);
   }
 );
 

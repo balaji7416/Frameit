@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import useAuth from "../context/auth/useAuth.js";
@@ -17,8 +17,14 @@ function LoginPage() {
 
   const navigate = useNavigate();
 
-  const { register, login, loading } = useAuth();
+  const { register, login, loading, user } = useAuth();
   const [rememberMe, setRememberME] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      navigate("/home", { replace: true });
+    }
+  }, [user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

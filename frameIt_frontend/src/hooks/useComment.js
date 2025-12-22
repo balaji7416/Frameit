@@ -30,11 +30,7 @@ function useComment(postId) {
     }
   };
 
-  useEffect(() => {
-    getComments(postId);
-  }, [postId]);
-
-  return { loading, error, commentPost, getComments };
+  return { loading, error, commentPost };
 }
 
 export default useComment;

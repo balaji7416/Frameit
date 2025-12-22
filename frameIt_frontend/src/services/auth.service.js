@@ -41,7 +41,11 @@ const logOutUser = async () => {
 
 const checkAuth = async () => {
   try {
-    const res = await api.get("/auth/me");
+    const res = await api.get("/auth/me", {
+      headers: {
+        "x-auth-init": "true",
+      },
+    });
     return res.data.data;
   } catch (err) {
     console.log("Auth check Error: ", err);

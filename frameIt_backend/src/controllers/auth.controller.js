@@ -24,6 +24,10 @@ const registerUser = asyncHandler(async (req, res) => {
     password
   );
 
+  const refreshMaxAge = rememberMe
+    ? 7 * 24 * 60 * 60 * 1000 // 7 days
+    : 24 * 60 * 60 * 1000; // 1 day (still persistent)
+
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     secure: isProd,
@@ -34,7 +38,7 @@ const registerUser = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: isProd,
     sameSite: isProd ? "none" : "lax",
-    ...(rememberMe && { maxAge: 7 * 24 * 60 * 1000 }),
+    maxAge: refreshMaxAge,
   });
 
   const sanitizedUser = {
@@ -64,6 +68,10 @@ const loginUser = asyncHandler(async (req, res) => {
     password
   );
 
+  const refreshMaxAge = rememberMe
+    ? 7 * 24 * 60 * 60 * 1000 // 7 days
+    : 24 * 60 * 60 * 1000; // 1 day (still persistent)
+
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     secure: isProd,
@@ -74,7 +82,7 @@ const loginUser = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: isProd,
     sameSite: isProd ? "none" : "lax",
-    ...(rememberMe && { maxAge: 7 * 24 * 60 * 60 * 1000 }),
+    maxAge: refreshMaxAge,
   });
 
   const sanitizedUser = {

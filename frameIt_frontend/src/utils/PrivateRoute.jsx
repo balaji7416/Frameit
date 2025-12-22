@@ -5,7 +5,11 @@ function PrivateRoute({ children }) {
   const { user, initialized } = useAuth();
 
   if (!initialized) {
-    return children;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spinner type="md" />
+      </div>
+    );
   }
 
   return user ? children : <Navigate to="/auth" replace />;

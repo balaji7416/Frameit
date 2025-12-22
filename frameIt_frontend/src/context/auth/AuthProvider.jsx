@@ -8,7 +8,7 @@ import {
 } from "../../services/auth.service.js";
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [initialized, setInitialized] = useState(false);
 
@@ -45,9 +45,8 @@ function AuthProvider({ children }) {
   const logout = async () => {
     try {
       setLoading(true);
-      const data = await logOutUser();
+      await logOutUser();
       setUser(null);
-      return data;
     } catch (err) {
       console.log("Logout Failed: ", err);
       setError(err);
@@ -61,24 +60,14 @@ function AuthProvider({ children }) {
     const authInit = async () => {
       try {
         console.log("Checking auth...");
-        setLoading(true);
+
         const data = await checkAuth();
         setUser(data);
         console.log("Auth check success: ", data);
       } catch (err) {
-        const status = err?.response?.status;
-        if (status === 401 || status === 403) {
-          // not logged in
-          setUser(null);
-        } else if (status === 429) {
-          console.warn("Too many requests: ", err);
-        } else {
-          console.warn("Auth check failed: ", err);
-          setError(err.response?.data?.message || err.message);
-        }
+        setUser(null);
         console.log("Auth check failed: ", err);
       } finally {
-        setLoading(false);
         setInitialized(true);
       }
     };

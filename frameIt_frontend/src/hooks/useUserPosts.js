@@ -8,7 +8,7 @@ function useUserPosts(username) {
 
   const getUserPosts = async () => {
     if (!username) {
-      throw Error("User not found: from useUserPosts hook");
+      throw new Error("User not found: from useUserPosts hook");
     }
     try {
       setLoading(true);

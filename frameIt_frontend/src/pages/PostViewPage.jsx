@@ -19,7 +19,7 @@ function PostViewPage() {
   const { toggleLikePost } = useToggleLike();
   const commentRef = useRef(null);
   const { id } = useParams();
-  const { loading, post } = useGetPost(id);
+  const { loading: postLoading, post } = useGetPost(id);
   const { posts, loading: postsLoading } = useGetPosts();
   const [showComments, setShowComments] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
@@ -208,7 +208,11 @@ function PostViewPage() {
               "flex items-center justify-center border-2 border-gray-200"
             )}
           >
-            <img src={post?.image} alt="" className="h-full object-contain" />
+            {postLoading ? (
+              <div className="animate-pulse bg-gray-200 h-full w-full rounded-md"></div>
+            ) : (
+              <img src={post?.image} alt="" className="h-full object-contain" />
+            )}
           </div>
 
           <div className="bg-white rounded-md px-3 py-1 space-y-2 min-w-0">
