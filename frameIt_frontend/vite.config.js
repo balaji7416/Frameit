@@ -9,13 +9,4 @@ export default defineConfig({
     outDir: "dist",
   },
   publicDir: "public",
-  server: {
-    proxy: {
-      "/api": {
-        target: "https://frameit-jnsz.onrender.com",
-        changeOrigin: true,
-        secure: true,
-      },
-    },
-  },
 });

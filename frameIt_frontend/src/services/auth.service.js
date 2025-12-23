@@ -8,6 +8,7 @@ const registerUser = async (username, email, password, rememberMe) => {
       password,
       rememberMe,
     });
+
     return res.data.data;
   } catch (err) {
     console.log("register Error: ", err);
@@ -39,14 +40,18 @@ const logOutUser = async () => {
   }
 };
 
-const checkAuth = async () => {
+const checkAuth = () => {
   try {
-    const res = await api.get("/auth/me", {
-      headers: {
-        "x-auth-init": "true",
-      },
-    });
-    return res.data.data;
+    const user = localStorage.getItem("user") ?? sessionStorage.getItem("user");
+    const token =
+      localStorage.getItem("accessToken") ??
+      sessionStorage.getItem("accessToken");
+
+    if (!token) {
+      throw new Error("Not authenticated");
+    }
+
+    return user ? JSON.parse(user) : null;
   } catch (err) {
     console.log("Auth check Error: ", err);
     throw err;

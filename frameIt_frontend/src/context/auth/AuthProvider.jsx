@@ -15,9 +15,25 @@ function AuthProvider({ children }) {
   const register = async (username, email, password, rememberMe) => {
     try {
       setLoading(true);
-      const data = await registerUser(username, email, password, rememberMe);
-      setUser(data);
-      return data;
+      setError(null);
+      const { refreshToken, accessToken, user } = await registerUser(
+        username,
+        email,
+        password,
+        rememberMe
+      );
+
+      // set the tokens in local / session storage
+      if (rememberMe && accessToken) {
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("user", JSON.stringify(user));
+      } else {
+        sessionStorage.setItem("accessToken", accessToken);
+        sessionStorage.setItem("user", JSON.stringify(user));
+      }
+
+      setUser(user);
+      return user;
     } catch (err) {
       console.log("Register Failed: ", err);
       setError(err);
@@ -30,9 +46,24 @@ function AuthProvider({ children }) {
   const login = async (email, password, rememberMe) => {
     try {
       setLoading(true);
-      const data = await loginUser(email, password, rememberMe);
-      setUser(data);
-      return data;
+      setError;
+      const { refreshToken, accessToken, user } = await loginUser(
+        email,
+        password,
+        rememberMe
+      );
+
+      // set the tokens in local / session storage
+      if (rememberMe && accessToken) {
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("user", JSON.stringify(user));
+      } else {
+        sessionStorage.setItem("accessToken", accessToken);
+        sessionStorage.setItem("user", JSON.stringify(user));
+      }
+
+      setUser(user);
+      return user;
     } catch (err) {
       console.log("Login Failed: ", err);
       setError(err);
@@ -45,7 +76,12 @@ function AuthProvider({ children }) {
   const logout = async () => {
     try {
       setLoading(true);
-      await logOutUser();
+      setError(null);
+
+      // remove the token from local storage
+      localStorage.clear();
+      sessionStorage.clear();
+
       setUser(null);
     } catch (err) {
       console.log("Logout Failed: ", err);
@@ -61,7 +97,7 @@ function AuthProvider({ children }) {
       try {
         console.log("Checking auth...");
 
-        const data = await checkAuth();
+        const data = checkAuth();
         setUser(data);
         console.log("Auth check success: ", data);
       } catch (err) {

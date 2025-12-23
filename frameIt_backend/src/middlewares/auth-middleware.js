@@ -4,7 +4,12 @@ import asyncHandler from "../utils/async-handler.js";
 import User from "../models/user.model.js";
 
 const authMiddleware = asyncHandler(async (req, res, next) => {
-  const token = req.cookies.accessToken;
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    throw new ApiError(401, "access token not found, please login");
+  }
+
+  const token = authHeader?.split(" ")[1];
   if (!token) {
     throw new ApiError(401, "access token not found, please login");
   }

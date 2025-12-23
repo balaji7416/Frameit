@@ -6,9 +6,9 @@ import ApiError from "../utils/api-error.js";
 
 const REFRESH_TOKEN_EXPIRY = 7 * 24 * 60 * 60 * 1000;
 
-const generateAccessToken = (_id) => {
+const generateAccessToken = (_id, rememberMe) => {
   return jwt.sign({ _id }, process.env.JWT_SECRET, {
-    expiresIn: "20m",
+    expiresIn: rememberMe ? "7d" : "1d",
   });
 };
 
@@ -30,7 +30,7 @@ const verifyAccessToken = (token) => {
   }
 };
 
-const registerUserService = async (username, email, password) => {
+const registerUserService = async (username, email, password, rememberMe) => {
   try {
     // check if user already exists
     const existingUser = await User.findOne({ email });
@@ -40,23 +40,23 @@ const registerUserService = async (username, email, password) => {
     const user = await User.create({ username, email, password });
     //generate refresh,access tokens
     const refreshToken = generateRefreshToken();
-    const accessToken = generateAccessToken(user._id);
+    const accessToken = generateAccessToken(user._id, rememberMe);
 
     //store refresh token hash in DB
-    const tokenHash = await bcrypt.hash(refreshToken, 10);
-    const tokenIdHash = crypto
-      .createHash("sha256")
-      .update(refreshToken)
-      .digest("hex");
+    // const tokenHash = await bcrypt.hash(refreshToken, 10);
+    // const tokenIdHash = crypto
+    //   .createHash("sha256")
+    //   .update(refreshToken)
+    //   .digest("hex");
 
-    const token = {
-      tokenHash,
-      tokenIdHash,
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRY),
-    };
-    user.refreshTokens.push(token);
-    await user.save();
+    // const token = {
+    //   tokenHash,
+    //   tokenIdHash,
+    //   createdAt: new Date(),
+    //   expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRY),
+    // };
+    // user.refreshTokens.push(token);
+    // await user.save();
 
     // return refresh and access tokens to controller
     return { accessToken, refreshToken, user };
@@ -66,7 +66,7 @@ const registerUserService = async (username, email, password) => {
   }
 };
 
-const loginUserService = async (email, password) => {
+const loginUserService = async (email, password, rememberMe) => {
   try {
     // find the user from database
     const user = await User.findOne({ email }).select("+password");
@@ -80,23 +80,23 @@ const loginUserService = async (email, password) => {
 
     //generate refresh,access tokens
     const refreshToken = generateRefreshToken();
-    const accessToken = generateAccessToken(user._id);
+    const accessToken = generateAccessToken(user._id, rememberMe);
 
     //store refresh token hash in DB
-    const tokenHash = await bcrypt.hash(refreshToken, 10);
-    const tokenIdHash = crypto
-      .createHash("sha256")
-      .update(refreshToken)
-      .digest("hex");
+    // const tokenHash = await bcrypt.hash(refreshToken, 10);
+    // const tokenIdHash = crypto
+    //   .createHash("sha256")
+    //   .update(refreshToken)
+    //   .digest("hex");
 
-    const token = {
-      tokenHash,
-      tokenIdHash,
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRY),
-    };
-    user.refreshTokens.push(token);
-    await user.save();
+    // const token = {
+    //   tokenHash,
+    //   tokenIdHash,
+    //   createdAt: new Date(),
+    //   expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRY),
+    // };
+    // user.refreshTokens.push(token);
+    // await user.save();
 
     // return refresh and access tokens to controller
     return { accessToken, refreshToken, user };
@@ -147,18 +147,18 @@ const refreshTokenService = async (refreshToken) => {
     const newRefreshToken = generateRefreshToken();
 
     //store new refresh token has in DB
-    const newTokenHash = await bcrypt.hash(newRefreshToken, 10);
-    const newTokenIdHash = crypto
-      .createHash("sha256")
-      .update(newRefreshToken)
-      .digest("hex");
-    const newToken = {
-      tokenHash: newTokenHash,
-      tokenIdHash: newTokenIdHash,
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRY),
-    };
-    user.refreshTokens.push(newToken);
+    // const newTokenHash = await bcrypt.hash(newRefreshToken, 10);
+    // const newTokenIdHash = crypto
+    //   .createHash("sha256")
+    //   .update(newRefreshToken)
+    //   .digest("hex");
+    // const newToken = {
+    //   tokenHash: newTokenHash,
+    //   tokenIdHash: newTokenIdHash,
+    //   createdAt: new Date(),
+    //   expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRY),
+    // };
+    // user.refreshTokens.push(newToken);
     await user.save();
 
     return { accessToken, refreshToken: newRefreshToken };
