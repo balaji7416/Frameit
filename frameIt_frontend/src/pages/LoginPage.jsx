@@ -5,11 +5,13 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import useAuth from "../context/auth/useAuth.js";
 import Spinner from "../components/Spinner.jsx";
 import { ArrowLeftIcon, Check } from "lucide-react";
+import useToast from "../context/toast/useToast.js";
 function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [formMessage, setFormMessage] = useState(null);
+  const { showToast } = useToast();
   const [searchParams] = useSearchParams();
   const [reg, setReg] = useState(() => {
     return searchParams.get("reg") === "true";
@@ -26,6 +28,16 @@ function LoginPage() {
     }
   }, [user]);
 
+  const handleUsernameChange = (e) => {
+    const USERNAME_REGEX = /^[a-zA-Z0-9_-]*$/;
+    if (!USERNAME_REGEX.test(e.target.value)) {
+      showToast("username must be alphanumeric", "error");
+      setUsername("");
+      return;
+    }
+
+    setUsername(e.target.value);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -101,7 +113,7 @@ function LoginPage() {
               value={username}
               placeholder="username"
               disabled={loading}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={handleUsernameChange}
               className={clsx(
                 "px-5 py-2 w-full rounded-md border-2 border-gray-200",
                 "bg-white text-sm sm:text-base text-gray-850",
