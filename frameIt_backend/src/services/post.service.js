@@ -1,7 +1,7 @@
 import Post from "../models/post.model.js";
 import { uploadFile, deleteFile } from "./cloudinary.service.js";
 import User from "../models/user.model.js";
-import mongoose from "mongoose";
+import mongoose, { Query } from "mongoose";
 import ApiError from "../utils/api-error.js";
 
 const fetchAllPosts = async () => {
@@ -156,6 +156,31 @@ const addCommentService = async (postId, userId, content) => {
   }
 };
 
+const fetchSearchResults = async (query) => {
+  if (!query || !query.trim()) {
+    return []; // silent safe fallback
+  }
+  try {
+    const searchResults = await Post.find(
+      {
+        $text: {
+          $search: query,
+        },
+      },
+      {
+        score: { $meta: "textScore" },
+      }
+    )
+      .sort({ score: { $meta: "textScore" } })
+      .limit(30);
+
+    return searchResults;
+  } catch (err) {
+    console.log("error in fetchSearchResults: ", err.message);
+    throw new ApiError(500, "server error while fetching search results");
+  }
+};
+
 export {
   fetchAllPosts,
   fetchPostById,
@@ -165,4 +190,5 @@ export {
   removePost,
   toggleLikePostService,
   addCommentService,
+  fetchSearchResults,
 };

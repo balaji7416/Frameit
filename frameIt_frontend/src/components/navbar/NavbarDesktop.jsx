@@ -8,10 +8,22 @@ import useToast from "../../context/toast/useToast.js";
 function Navbar() {
   const [openUserMenu, setOpenUserMenu] = useState(false);
 
+  const [searchQuery, setSearchQuery] = useState("");
+
   const { user, logout } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const userMenuRef = useRef(null);
+
+  // handle search
+  const handleSearch = async () => {
+    try {
+      setSearchQuery("");
+      navigate(`/search?query=${searchQuery}`);
+    } catch (err) {
+      console.log("Error in handleSearch: ", err);
+    }
+  };
 
   {
     /*handle user popup on outside click */
@@ -67,10 +79,14 @@ function Navbar() {
       <h1 className="text-base sm:text-lg md:text-xl font-bold hidden md:block">
         Logo
       </h1>
-      <div
+      <form
         className={clsx(
           "flex items-center gap-1 flex-1 rounded-md bg-gray-100"
         )}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSearch();
+        }}
       >
         <button className={clsx("p-1  rounded-l-md")}>
           <Search className={clsx("text-gray-300")} size={20} />
@@ -79,11 +95,14 @@ function Navbar() {
         <input
           type="text"
           placeholder="Search..."
+          value={searchQuery}
           onChange={(e) => {
             if (!user) {
               e.preventDefault();
               showToast("Please login to search", "info");
               e.target.value = "";
+            } else {
+              setSearchQuery(e.target.value);
             }
           }}
           className={clsx(
@@ -91,7 +110,7 @@ function Navbar() {
             "outline-none"
           )}
         />
-      </div>
+      </form>
 
       {/* user menu */}
       {user && (

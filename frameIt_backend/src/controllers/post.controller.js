@@ -11,6 +11,7 @@ import {
   toggleLikePostService,
   addCommentService,
   fetchPostById,
+  fetchSearchResults,
 } from "../services/post.service.js";
 
 const getAllPosts = asyncHandler(async (req, res) => {
@@ -112,6 +113,17 @@ const getComments = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "comments fetched successfully", comments));
 });
 
+const getSearchResults = asyncHandler(async (req, res) => {
+  const { query } = req.query;
+
+  if (!query || !query.trim()) {
+    throw new ApiError(400, "search query is missing");
+  }
+
+  const posts = await fetchSearchResults(query);
+  return res.status(200).json(new ApiResponse(200, "search results", posts));
+});
+
 export {
   getAllPosts,
   getPostById,
@@ -121,4 +133,5 @@ export {
   deletePost,
   toggleLikePost,
   addComment,
+  getSearchResults,
 };

@@ -10,6 +10,7 @@ import {
   addComment,
   getPostById,
   getComments,
+  getSearchResults,
 } from "../controllers/post.controller.js";
 import express from "express";
 import authMiddleware from "../middlewares/auth-middleware.js";
@@ -24,4 +25,5 @@ router.post("/", authMiddleware, upload.single("image"), createPost);
 router.delete("/:id", authMiddleware, deletePost);
 router.post("/toggle-like/:id", authMiddleware, toggleLikePost);
 router.post("/comment/:id", authMiddleware, addComment);
+router.get("/search", getSearchResults);
 export default router;

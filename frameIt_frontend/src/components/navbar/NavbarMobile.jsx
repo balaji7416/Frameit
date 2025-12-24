@@ -16,6 +16,7 @@ import useToast from "../../context/toast/useToast.js";
 import { useNavigate } from "react-router";
 
 function NavbarMobile() {
+  const [searchQuery, setSearchQuery] = useState("");
   const [showMenu, setShowMenu] = useState(false);
 
   const menuRef = useRef();
@@ -24,6 +25,17 @@ function NavbarMobile() {
   const { user, logout } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+
+  // handle search
+  const handleSearch = async () => {
+    try {
+      setSearchQuery("");
+      navigate(`/search?query=${searchQuery}`);
+    } catch (err) {
+      console.log("Error in handleSearch: ", err);
+    }
+  };
+
   {
     /*menu close on outside click */
   }
@@ -70,10 +82,14 @@ function NavbarMobile() {
         "shadow-lg border-b-2 border-gray-100"
       )}
     >
-      <div
+      <form
         className={clsx(
           "flex items-center gap-1 flex-1 rounded-md bg-gray-100"
         )}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSearch();
+        }}
       >
         <button className={clsx("p-1  rounded-l-md")}>
           <Search className={clsx("text-gray-300")} size={20} />
@@ -82,12 +98,15 @@ function NavbarMobile() {
         <input
           type="text"
           placeholder="Search..."
+          value={searchQuery}
           ref={searchRef}
           onChange={(e) => {
             if (!user) {
               e.preventDefault();
               showToast("Please login to search", "info");
               e.target.value = "";
+            } else {
+              setSearchQuery(e.target.value);
             }
           }}
           className={clsx(
@@ -95,11 +114,11 @@ function NavbarMobile() {
             "outline-none"
           )}
         />
-      </div>
+      </form>
 
       {/*menu on smaller screens */}
       {user && (
-        <div className="relative bg-gray-100" ref={menuRef}>
+        <div className="relative " ref={menuRef}>
           <Menu
             className={clsx("font-bold text-gray-800")}
             onClick={() => setShowMenu((prev) => !prev)}
@@ -109,7 +128,8 @@ function NavbarMobile() {
             <div
               className={clsx(
                 "absolute top-full right-1/2 flex flex-col items-center gap-2 bg-white z-50",
-                "w-[300px] rounded-md shadow-md"
+                "w-[200px] rounded-md shadow-md",
+                "text-sm md:text-base"
               )}
             >
               <Link

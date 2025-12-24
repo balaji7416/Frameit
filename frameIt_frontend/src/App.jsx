@@ -8,6 +8,7 @@ import UserPostsPage from "./pages/UserPostsPage.jsx";
 import MainLayout from "./layouts/MainLayout.jsx";
 import PrivateRoute from "./utils/PrivateRoute.jsx";
 import PostViewPage from "./pages/PostViewPage.jsx";
+import SearchResultsPage from "./pages/SearchResultsPage.jsx";
 import { User } from "lucide-react";
 
 export default function App() {
@@ -49,6 +50,14 @@ export default function App() {
             element={
               <PrivateRoute>
                 <PostViewPage />
+              </PrivateRoute>
+            }
+          ></Route>
+          <Route
+            path="/search"
+            element={
+              <PrivateRoute>
+                <SearchResultsPage />
               </PrivateRoute>
             }
           ></Route>

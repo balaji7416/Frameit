@@ -172,13 +172,14 @@ function PostViewPage() {
                 <div
                   className={clsx(
                     "flex flex-col gap-2 mt-4",
-                    "absolute top-full right-0 w-[300px] z-10 bg-white",
-                    "p-3 rounded-md shadow-md"
+                    "absolute top-full right-0 w-[220px] md:w-[300px] z-10 bg-white",
+                    "p-2 rounded-md shadow-md",
+                    "text-sm md:text-base text-gray-800"
                   )}
                 >
                   <button
                     className={clsx(
-                      "flex items-center justify-center gap-5 border-b border-gray-300 p-2",
+                      "flex items-center justify-center gap-5 border-b border-gray-300 p-1 md:p-2",
                       "text-gray-800 font-bold  active:scale-[.98] cursor-pointer"
                     )}
                     onClick={handleDownload}
@@ -186,15 +187,15 @@ function PostViewPage() {
                     {" "}
                     <Download /> Download
                   </button>
-                  <button
+                  {/* <button
                     className={clsx(
-                      "flex items-center justify-center gap-5 p-2",
+                      "flex items-center justify-center gap-5 p-1 md:p-2",
                       "text-gray-800 font-bold  active:scale-[.98] cursor-pointer"
                     )}
                   >
                     {" "}
                     <Heart /> Favourite
-                  </button>
+                  </button> */}
                 </div>
               )}
             </div>
