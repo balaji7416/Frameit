@@ -77,7 +77,7 @@ function Navbar() {
     >
       {/*menu on larger screens */}
       <h1 className="text-base sm:text-lg md:text-xl font-bold hidden md:block">
-        Logo
+        FrameIT
       </h1>
       <form
         className={clsx(
