@@ -80,6 +80,7 @@ function LoginPage() {
           "font-bold"
         )}
         onClick={() => navigate("/", { replace: true })}
+        disabled={loading}
       >
         <ArrowLeftIcon className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 w-10" />
       </button>
@@ -207,6 +208,7 @@ function LoginPage() {
           <button
             onClick={toggleMode}
             className="text-blue-600 font-bold focus:text-blue-500 active:text-blue-700"
+            disabled={loading}
           >
             {!reg ? "SignUp" : "Login"}
           </button>
