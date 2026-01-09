@@ -19,7 +19,7 @@ function HomePage() {
     const hasWelcomed = sessionStorage.getItem("hasWelcomed");
     if (hasWelcomed) return;
 
-    sessionStorage.setItem("hasWelcomed", "true");
+    sessionStorage.setItem("hasWelcomed", true);
     showToast("Hello " + (user ? user.username : "Guest") + "!", "success");
   }, []);
 

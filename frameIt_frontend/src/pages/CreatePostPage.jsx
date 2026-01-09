@@ -105,7 +105,7 @@ function CreatePostPage() {
             )}
           />
           <p className={clsx("text-sm font-semibold")}>Content</p>
-          <input
+          <textarea
             type="text"
             value={content}
             disabled={loading}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../api/axios";
 function useSearch() {
-  const [loadinng, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const searchPosts = async (searchQuery) => {
     try {
@@ -16,7 +16,7 @@ function useSearch() {
     }
   };
 
-  return { searchPosts, loadinng };
+  return { searchPosts, loading };
 }
 
 export default useSearch;
