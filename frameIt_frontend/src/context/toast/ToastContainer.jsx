@@ -3,7 +3,7 @@ import useToast from "./useToast.js";
 function ToastContainer() {
   const { toasts } = useToast();
   return (
-    <div className="fixed top-12 right-5 mt-3 flex flex-col flex-col-reverseh-auto gap-4 z-50  pointer-events-none">
+    <div className="fixed top-12 right-5 mt-3 flex flex-col  h-auto gap-4 z-50  pointer-events-none">
       {toasts.map((toast) => (
         <div
           key={toast.id}

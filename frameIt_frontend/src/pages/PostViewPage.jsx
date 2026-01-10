@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { useParams } from "react-router-dom";
 import { useState, useEffect, useMemo, useRef } from "react";
+import { motion } from "framer-motion";
 import useGetPost from "../hooks/useGetPost";
 import Gallery from "../components/Gallery";
 import useGetPosts from "../hooks/useGetPosts.js";
@@ -82,12 +83,18 @@ function PostViewPage() {
 
   //handle like post
   const handleToggleLike = async () => {
+    const prevLikes = likes;
+    const prevIsLiked = isLiked;
+
     try {
+      setLikes((likes) => (isLiked ? likes - 1 : likes + 1));
+      setIsLiked((isLiked) => !isLiked);
       const res = await toggleLikePost(post._id);
       setIsLiked(res.includes(user._id));
-      setLikes(res.length);
     } catch (err) {
       console.log("error while liking post: ", err);
+      setLikes(prevLikes);
+      setIsLiked(prevIsLiked);
     }
   };
 
@@ -143,11 +150,13 @@ function PostViewPage() {
             <button
               className=" flex items-center gap-2 "
               onClick={() => {
-                commentRef?.current?.focus();
                 commentRef?.current?.scrollIntoView({
                   behavior: "smooth",
                   block: "center",
                 });
+                setTimeout(() => {
+                  commentRef?.current?.focus();
+                }, 500);
               }}
             >
               <MessageCircle
@@ -202,21 +211,46 @@ function PostViewPage() {
           </div>
 
           {/* Image */}
-          <div
+          <motion.div
+            layout="position"
+            transition={{
+              layout: {
+                duration: 0.5,
+                ease: "easeInOut",
+              },
+            }}
             className={clsx(
-              "w-full shrink-0 h-[300px] sm:h-[400px] md:h-[500px] overflow-hidden p-2",
+              // "w-full shrink-0 h-[300px] sm:h-[400px] md:h-[500px] overflow-hidden p-2",
+              "w-full  p-2",
               "rounded-md",
               "flex items-center justify-center border-2 border-gray-200"
             )}
           >
             {postLoading ? (
-              <div className="animate-pulse bg-gray-200 h-full w-full rounded-md"></div>
+              <div className="animate-pulse h-full w-full rounded-md"></div>
             ) : (
-              <img src={post?.image} alt="" className="h-full object-contain" />
+              <motion.img
+                src={post?.image}
+                alt={post?.title}
+                layoutId={`post-image-${post?._id}`}
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{
+                  duration: 0.5,
+                  ease: [0.4, 0, 0.3, 1],
+                }}
+                className="w-full h-auto object-contain max-h-[70vh]"
+              />
             )}
-          </div>
+          </motion.div>
 
-          <div className="bg-white rounded-md px-3 py-1 space-y-2 min-w-0">
+          <div
+            className={clsx(
+              "bg-white rounded-md px-3 py-1 space-y-2 min-w-0",
+              postLoading ? "hidden" : ""
+            )}
+          >
             {/* Preview */}
             <h1 className="font-semibold text-base md:text-lg line-clamp-1 break-all overflow-hidden">
               {post?.title}
@@ -243,7 +277,12 @@ function PostViewPage() {
           </div>
 
           {/* comment section */}
-          <div className="bg-white rounded-md p-3 space-y-3">
+          <div
+            className={clsx(
+              "bg-white rounded-md p-3 space-y-3",
+              postLoading ? "hidden" : ""
+            )}
+          >
             {/* Header */}
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-sm">

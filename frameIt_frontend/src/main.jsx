@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
+import { LayoutGroup } from "framer-motion";
 
 import "./index.css";
 import App from "./App.jsx";
@@ -10,7 +11,9 @@ createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <ToastProvider>
       <AuthProvider>
-        <App />
+        <LayoutGroup>
+          <App />
+        </LayoutGroup>
       </AuthProvider>
     </ToastProvider>
   </BrowserRouter>

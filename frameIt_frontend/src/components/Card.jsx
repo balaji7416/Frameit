@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { MoreHorizontal, Download, Heart, Trash2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { motion } from "framer-motion";
 
 export default function Card({
   img_url,
@@ -69,10 +70,11 @@ export default function Card({
   return (
     <div className={clsx("mb-4 rounded-mdflex flex-col gap-2", "")}>
       <div className="rounded-md overflow-hidden rounded-md shadow-md focus:scale-[1.02] active:scale-[.98]">
-        <img
+        <motion.img
           src={img_url}
           alt={alt}
           loading="lazy"
+          layoutId={`post_image-${_id}`}
           className="w-full object-cover rounded-md shadow-md"
           onClick={() => navigate(`/post/${_id}`)}
         />

@@ -10,12 +10,13 @@ import PrivateRoute from "./utils/PrivateRoute.jsx";
 import PostViewPage from "./pages/PostViewPage.jsx";
 import SearchResultsPage from "./pages/SearchResultsPage.jsx";
 import { User } from "lucide-react";
-
+import ScrollToTop from "./components/ScrollToTop.jsx";
 export default function App() {
   return (
     <div>
       <Navbar />
 
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<LandingPage />}></Route>
         <Route path="/auth" element={<LoginPage />}></Route>
