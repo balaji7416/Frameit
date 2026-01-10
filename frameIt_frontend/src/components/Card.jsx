@@ -67,16 +67,32 @@ export default function Card({
     );
   }
 
+  const handleImageClick = () => {
+    const image = new Image();
+    image.src = img_url;
+
+    navigate(`/post/${_id}`);
+  };
   return (
     <div className={clsx("mb-4 rounded-mdflex flex-col gap-2", "")}>
-      <div className="rounded-md overflow-hidden rounded-md shadow-md focus:scale-[1.02] active:scale-[.98]">
+      <div
+        className={clsx(
+          "rounded-md overflow-hidden rounded-md shadow-md",
+          " focus:scale-[1.05] active:scale-[.98] cursor-pointer hover:scale-[1.01]",
+          "transition-all duration-150 ease-in-out"
+        )}
+      >
         <motion.img
           src={img_url}
           alt={alt}
           loading="lazy"
           layoutId={`post_image-${_id}`}
           className="w-full object-cover rounded-md shadow-md"
-          onClick={() => navigate(`/post/${_id}`)}
+          onMouseEnter={() => {
+            const img = new Image();
+            img.src = img_url;
+          }}
+          onClick={handleImageClick}
         />
       </div>
 

@@ -213,6 +213,8 @@ function PostViewPage() {
           {/* Image */}
           <motion.div
             layout="position"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{
               layout: {
                 duration: 0.5,
@@ -227,7 +229,7 @@ function PostViewPage() {
             )}
           >
             {postLoading ? (
-              <div className="animate-pulse h-full w-full rounded-md"></div>
+              <div className="animate-pulse bg-gray-100 h-full w-full rounded-md"></div>
             ) : (
               <motion.img
                 src={post?.image}
