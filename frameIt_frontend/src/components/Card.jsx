@@ -1,15 +1,16 @@
+// React & core libraries
+import { useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+// Third-party libraries
 import clsx from "clsx";
 import { MoreHorizontal, Download, Heart, Trash2 } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 export default function Card({
-  img_url,
-  title,
-  _id,
-  alt,
-  loading,
+  post,
+  posts,
+  postLoading,
   isOwner,
   isOpen,
   onToggle,
@@ -17,12 +18,14 @@ export default function Card({
   onDownload,
   downloadLoading,
 }) {
+  // derived states and refs
   const buttonRef = useRef(null);
   const popupRef = useRef(null);
+
+  // actions
   const navigate = useNavigate();
-  {
-    /* close popup when clicking outside */
-  }
+
+  // actions: close popup when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -41,23 +44,17 @@ export default function Card({
     };
   }, [isOpen, onToggle]);
 
-  // {
-  //   /* close popup when scrolling */
-  // }
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     if (isOpen) {
-  //       onToggle();
-  //     }
-  //   };
+  // handlers: image click
+  const handleImageClick = () => {
+    if (postLoading) return;
 
-  //   window.addEventListener("scroll", handleScroll);
-  //   return () => {
-  //     window.removeEventListener("scroll", handleScroll);
-  //   };
-  // }, [isOpen, onToggle]);
+    navigate(`/post/${post?._id}`, {
+      state: { post, posts },
+    });
+  };
 
-  if (loading) {
+  //handle loading state
+  if (postLoading) {
     return (
       <div className={clsx("mb-4 rounded-md ", "animate-pulse")}>
         {/* skeleton UI here */}
@@ -67,33 +64,23 @@ export default function Card({
     );
   }
 
-  const handleImageClick = () => {
-    const image = new Image();
-    image.src = img_url;
-
-    navigate(`/post/${_id}`);
-  };
   return (
     <div className={clsx("mb-4 rounded-mdflex flex-col gap-2", "")}>
       <div
         className={clsx(
-          "rounded-md overflow-hidden rounded-md shadow-md",
+          "rounded-md overflow-hidden shadow-md",
           " focus:scale-[1.05] active:scale-[.98] cursor-pointer hover:scale-[1.01]",
-          "transition-all duration-150 ease-in-out"
+          "transition-all duration-150 ease-in-out",
         )}
       >
+        {/* post image */}
         <motion.img
-          src={img_url}
-          alt={alt}
-          loading="lazy"
-          layoutId={`post_image-${_id}`}
+          src={post?.image}
+          alt={post?.title || "Post Image"}
+          layoutId={`post-image-${post?._id}`}
           className="w-full object-cover rounded-md shadow-md"
-          onMouseEnter={() => {
-            const img = new Image();
-            img.src = img_url;
-          }}
           onClick={handleImageClick}
-        />
+        ></motion.img>
       </div>
 
       <div className="relative">
@@ -111,33 +98,25 @@ export default function Card({
               "absolute top-full w-full",
               " bg-gray-100 border-2 border-gray-300 rounded-md shadow-lg",
               "flex flex-col gap-1 p-1 z-50",
-              "text-sm sm:text-base"
+              "text-sm sm:text-base",
             )}
             ref={popupRef}
           >
             <button
               className={clsx(
                 "flex items-center justify-center gap-5 p-2 border-b border-gray-300",
-                "text-gray-800 font-bold  active:scale-[.98] cursor-pointer "
+                "text-gray-800 font-bold  active:scale-[.98] cursor-pointer ",
               )}
               onClick={onDownload}
               disabled={downloadLoading}
             >
               <Download size={15} /> Download
             </button>
-            {/* <button
-              className={clsx(
-                "flex items-center justify-center gap-5 p-2",
-                "text-gray-800 font-bold  active:scale-[.98] cursor-pointer"
-              )}
-            >
-              <Heart size={15} /> Favourite
-            </button> */}
             {isOwner && (
               <button
                 className={clsx(
                   "flex items-center justify-center gap-5 p-2",
-                  "text-gray-800 font-bold  active:scale-[.98] cursor-pointer"
+                  "text-gray-800 font-bold  active:scale-[.98] cursor-pointer",
                 )}
                 onClick={onDelete}
               >

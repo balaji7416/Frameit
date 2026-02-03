@@ -1,52 +1,87 @@
-import clsx from "clsx";
-import { useParams } from "react-router-dom";
+// React & core libraries
 import { useState, useEffect, useMemo, useRef } from "react";
-import { motion } from "framer-motion";
+
+// Third party libraries
+import clsx from "clsx";
+import { useParams, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Heart, MessageCircle, MoreHorizontal, Download } from "lucide-react";
+
+// custom hooks
 import useGetPost from "../hooks/useGetPost";
-import Gallery from "../components/Gallery";
-import useGetPosts from "../hooks/useGetPosts.js";
 import useComment from "../hooks/useComment.js";
+import useGetPosts from "../hooks/useGetPosts.js";
 import useToast from "../context/toast/useToast.js";
 import useAuth from "../context/auth/useAuth.js";
 import useToggleLike from "../hooks/useToggleLike.js";
 import useDownloadPosts from "../hooks/useDownloadPosts.js";
-import { Heart, MessageCircle, MoreHorizontal, Download } from "lucide-react";
-import Card from "../components/Card.jsx";
+
+// local components
+import Gallery from "../components/Gallery";
 
 function PostViewPage() {
+  // ─── Environment / Context ──────────────────────────────
   const { user } = useAuth();
+  const { postId } = useParams();
+  const { state } = useLocation();
+  const prefetchedPost = state?.post;
+  // const prefetchedPosts = state?.posts;
 
-  const { downloadPost } = useDownloadPosts();
+  // ─── Data fetching ──────────────────────────────────────
+  const { loading: postLoading, post } = useGetPost(postId, {
+    initialData: prefetchedPost,
+  });
+
+  const { posts, postsLoading: postsLoading } = useGetPosts({});
+  const { loading: commentLoading, commentPost } = useComment(post?._id);
+
+  // ─── Actions / mutations ────────────────────────────────
   const { toggleLikePost } = useToggleLike();
+  const { downloadPost } = useDownloadPosts();
+  const { showToast } = useToast();
+
+  // ─── Refs ───────────────────────────────────────────────
   const commentRef = useRef(null);
-  const { id } = useParams();
-  const { loading: postLoading, post } = useGetPost(id);
-  const { posts, loading: postsLoading } = useGetPosts();
+
+  // ─── UI state: visibility ───────────────────────────────
   const [showComments, setShowComments] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
-  const { showToast } = useToast();
-  const [localComments, setLocalComments] = useState([]);
-  const { loading: commentLoading, commentPost } = useComment(post?._id);
+  const [showPostOptions, setShowPostOptions] = useState(false);
+
+  // ─── UI state: interactions ────────────────────────────
   const [comment, setComment] = useState("");
+  const [localComments, setLocalComments] = useState([]);
+
+  // ─── UI state: engagement ──────────────────────────────
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState(0);
 
-  const [showPostOptions, setShowPostOptions] = useState(false);
-
+  // ─── Derived data ───────────────────────────────────────
   const filteredPosts = useMemo(() => {
     if (!posts) return [];
-    return posts.filter((p) => p._id !== id);
-  }, [posts, id]);
+    return posts.filter((p) => p._id !== postId);
+  }, [posts, postId]);
 
-  // update local comments when post is fetched
+  // ─── Sync effects ───────────────────────────────────────
+
+  // sync comments when post changes
   useEffect(() => {
     if (post?.comments) {
-      setLocalComments(post?.comments);
+      setLocalComments(post.comments);
     }
   }, [post]);
 
+  // initialize likes state
+  useEffect(() => {
+    if (!post || !user) return;
+    setIsLiked(post.likes.includes(user._id));
+    setLikes(post.likes.length);
+  }, [post, user]);
+
+  // ─── Handlers: comments ─────────────────────────────
   const handleComment = async (e) => {
     e.preventDefault();
+
     if (!comment.trim()) {
       showToast("comment cannot be empty", "error");
       return;
@@ -64,46 +99,41 @@ function PostViewPage() {
     setComment("");
 
     try {
-      await commentPost(id, comment);
+      await commentPost(postId, comment);
     } catch (err) {
-      console.log("error while commenting in PostViewPage: ", err);
+      console.error("error while commenting:", err);
       showToast(
         err?.response?.data?.message || err?.message || "error commenting",
-        "error"
+        "error",
       );
     }
   };
 
-  //intial values of likes and isliked
-  useEffect(() => {
-    if (!post || !user) return;
-    setIsLiked(post.likes.includes(user._id));
-    setLikes(post.likes.length);
-  }, [post, user]);
-
-  //handle like post
+  // ─── Handlers: likes ────────────────────────────────────
   const handleToggleLike = async () => {
     const prevLikes = likes;
     const prevIsLiked = isLiked;
 
+    setLikes((l) => (isLiked ? l - 1 : l + 1));
+    setIsLiked((v) => !v);
+
     try {
-      setLikes((likes) => (isLiked ? likes - 1 : likes + 1));
-      setIsLiked((isLiked) => !isLiked);
       const res = await toggleLikePost(post._id);
       setIsLiked(res.includes(user._id));
     } catch (err) {
-      console.log("error while liking post: ", err);
+      console.error("error while liking post:", err);
       setLikes(prevLikes);
       setIsLiked(prevIsLiked);
     }
   };
 
+  // ─── Handlers: download ─────────────────────────────────
   const handleDownload = async () => {
     try {
       await downloadPost(post?.image, `${post?.title}.jpg`);
       showToast("Image downloaded successfully", "success");
     } catch (err) {
-      console.log("error while downloading post: ", err);
+      console.error("error while downloading post:", err);
       showToast("Error downloading image", "error");
     }
   };
@@ -113,20 +143,20 @@ function PostViewPage() {
       className={clsx(
         "min-h-screen p-3 sm:p-5 md:p-7",
         "flex flex-col items-center gap-5",
-        "bg-white"
+        "bg-white",
       )}
     >
       <div className={clsx("flex gap-2 lg:gap-5 w-full", "")}>
         <div
           className={clsx(
             "relative w-full lg:w-3/5 min-h-[600px] flex flex-col gap-2 p-2",
-            "rounded-md shadow-md bg-white border-2 border-gray-100"
+            "rounded-md shadow-md bg-white border-2 border-gray-100",
           )}
         >
           <div
             className={clsx(
               "bg-white w-full h-1/10",
-              "flex items-center justify-evenly p-3 "
+              "flex items-center justify-evenly p-3 ",
             )}
           >
             <button
@@ -138,7 +168,7 @@ function PostViewPage() {
                   " font-bold h-7 w-7 md:h-8 w-8",
                   isLiked
                     ? "text-red-600 fill-red-600"
-                    : "text-gray-600 fill-none"
+                    : "text-gray-600 fill-none",
                 )}
               />
               <h1
@@ -161,7 +191,7 @@ function PostViewPage() {
             >
               <MessageCircle
                 className={clsx(
-                  "font-bold h-7 w-7 md:h-8 w-8 text-gray-600 cursor-pointer active:scale-[.98]"
+                  "font-bold h-7 w-7 md:h-8 w-8 text-gray-600 cursor-pointer active:scale-[.98]",
                 )}
               />
               <h1>{localComments?.length}</h1>
@@ -173,7 +203,7 @@ function PostViewPage() {
               <button className=" flex items-center gap-2">
                 <MoreHorizontal
                   className={clsx(
-                    " font-bold h-7 w-7 md:h-8 w-8 text-gray-600 "
+                    " font-bold h-7 w-7 md:h-8 w-8 text-gray-600 ",
                   )}
                 />
               </button>
@@ -183,13 +213,13 @@ function PostViewPage() {
                     "flex flex-col gap-2 mt-4",
                     "absolute top-full right-0 w-[220px] md:w-[300px] z-10 bg-white",
                     "p-2 rounded-md shadow-md",
-                    "text-sm md:text-base text-gray-800"
+                    "text-sm md:text-base text-gray-800",
                   )}
                 >
                   <button
                     className={clsx(
                       "flex items-center justify-center gap-5 border-b border-gray-300 p-1 md:p-2",
-                      "text-gray-800 font-bold  active:scale-[.98] cursor-pointer"
+                      "text-gray-800 font-bold  active:scale-[.98] cursor-pointer",
                     )}
                     onClick={handleDownload}
                   >
@@ -213,44 +243,40 @@ function PostViewPage() {
           {/* Image */}
           <motion.div
             layout="position"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              layout: {
-                duration: 0.5,
-                ease: "easeInOut",
-              },
-            }}
+            key={post?._id}
             className={clsx(
               // "w-full shrink-0 h-[300px] sm:h-[400px] md:h-[500px] overflow-hidden p-2",
               "w-full  p-2",
               "rounded-md",
-              "flex items-center justify-center border-2 border-gray-200"
+              "flex items-center justify-center border-2 border-gray-200",
             )}
           >
-            {postLoading ? (
-              <div className="animate-pulse bg-gray-100 h-full w-full rounded-md"></div>
-            ) : (
-              <motion.img
-                src={post?.image}
-                alt={post?.title}
-                layoutId={`post-image-${post?._id}`}
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={{
-                  duration: 0.5,
-                  ease: [0.4, 0, 0.3, 1],
-                }}
-                className="w-full h-auto object-contain max-h-[70vh]"
-              />
-            )}
+            <AnimatePresence>
+              {postLoading ? (
+                <div
+                  className="animate-pulse bg-gray-100 h-full w-full rounded-md"
+                  key="skeleton"
+                ></div>
+              ) : (
+                <motion.img
+                  src={post?.image}
+                  key={post?._id}
+                  alt={post?.title}
+                  layoutId={`post-image-hero-${post?._id}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                  transition={{ duration: 0.6, ease: "easeInOut" }}
+                  className="w-full h-auto object-contain max-h-[70vh]"
+                />
+              )}
+            </AnimatePresence>
           </motion.div>
 
           <div
             className={clsx(
               "bg-white rounded-md px-3 py-1 space-y-2 min-w-0",
-              postLoading ? "hidden" : ""
+              postLoading ? "hidden" : "",
             )}
           >
             {/* Preview */}
@@ -263,7 +289,7 @@ function PostViewPage() {
                 "text-sm text-gray-700 transition-all break-all overflow-hidden ",
                 showFullContent
                   ? "max-h-[200px] overflow-y-auto"
-                  : "line-clamp-2"
+                  : "line-clamp-2",
               )}
             >
               {post?.content}
@@ -282,7 +308,7 @@ function PostViewPage() {
           <div
             className={clsx(
               "bg-white rounded-md p-3 space-y-3",
-              postLoading ? "hidden" : ""
+              postLoading ? "hidden" : "",
             )}
           >
             {/* Header */}
@@ -309,7 +335,7 @@ function PostViewPage() {
                 className={clsx(
                   "flex-1 border border-gray-300 rounded-md px-3 py-1 sm:py-2 text-sm outline-none",
                   "focus:ring-1 focus:ring-blue-500",
-                  "transition-all duration-150 ease-in-out"
+                  "transition-all duration-150 ease-in-out",
                 )}
                 disabled={commentLoading}
               />
@@ -326,7 +352,7 @@ function PostViewPage() {
               <div
                 className={clsx(
                   "max-h-[250px] overflow-y-auto space-y-2  pt-2",
-                  "flex flex-col gap-1"
+                  "flex flex-col gap-1",
                 )}
               >
                 {localComments.map((comment) => (
@@ -336,7 +362,7 @@ function PostViewPage() {
                       "flex flex-col justify-between",
                       "text-sm",
                       "border-b border-gray-200",
-                      "p-1 sm:p-2 rounded-md"
+                      "p-1 sm:p-2 rounded-md",
                     )}
                   >
                     <span className="font-medium">
@@ -354,7 +380,7 @@ function PostViewPage() {
 
         <div
           className={clsx(
-            "shadow-md rounded-md hidden lg:flex w-2/5 min-h-[800px]"
+            "shadow-md rounded-md hidden lg:flex w-2/5 min-h-[800px]",
           )}
         ></div>
       </div>

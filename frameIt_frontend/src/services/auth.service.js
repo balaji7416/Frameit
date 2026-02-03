@@ -30,23 +30,23 @@ const loginUser = async (email, password, rememberMe) => {
   }
 };
 
-const logOutUser = async () => {
-  try {
-    const res = await api.post("/auth/logout");
-    return res.data.data;
-  } catch (err) {
-    console.log("logout Error: ", err);
-    throw err;
-  }
-};
+// not in use since local storage is used instead of cookies
+// const logOutUser = async () => {
+//   try {
+//     const res = await api.post("/auth/logout");
+//     return res.data.data;
+//   } catch (err) {
+//     console.log("logout Error: ", err);
+//     throw err;
+//   }
+// };
 
-const checkAuth = () => {
+const checkAuth = async () => {
   try {
     const user = localStorage.getItem("user") ?? sessionStorage.getItem("user");
     const token =
-      localStorage.getItem("accessToken") ??
-      sessionStorage.getItem("accessToken");
-
+      localStorage.getItem("token") ?? sessionStorage.getItem("token");
+    console.log(token);
     if (!token) {
       throw new Error("Not authenticated");
     }
@@ -58,4 +58,4 @@ const checkAuth = () => {
   }
 };
 
-export { registerUser, loginUser, logOutUser, checkAuth };
+export { registerUser, loginUser, checkAuth };

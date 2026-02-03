@@ -1,11 +1,20 @@
-import Masonry from "react-masonry-css";
-import Card from "./Card.jsx";
+// React and core libraries
 import { useState } from "react";
+
+// Third-party libraries
+import Masonry from "react-masonry-css";
+import clsx from "clsx";
+
+// hooks/context
 import useToast from "../context/toast/useToast.js";
 import useDeletePost from "../hooks/useDeletePosts.js";
 import useDownloadPosts from "../hooks/useDownloadPosts.js";
 
+//components
+import Card from "./Card.jsx";
+
 export default function Gallery({ posts, loading, isOwner, setPosts }) {
+  // Masonry breakpoint columns
   const breakpointColumnsObj = {
     default: 5,
     1200: 4,
@@ -17,10 +26,11 @@ export default function Gallery({ posts, loading, isOwner, setPosts }) {
   const [openMenuId, setOpenMenuId] = useState(null);
   const { showToast } = useToast();
 
+  // hooks: delete, download
   const { loading: downloadLoading, downloadPost } = useDownloadPosts();
-
   const { loading: deleteLoading, deletePost } = useDeletePost();
 
+  // Handlers: delete
   const handleDelete = async (postId) => {
     if (deleteLoading) showToast("Deletion in progress...", "info");
     try {
@@ -32,6 +42,7 @@ export default function Gallery({ posts, loading, isOwner, setPosts }) {
     }
   };
 
+  // Handlers: download
   const handleDownload = async (imageUrl, filename) => {
     try {
       await downloadPost(imageUrl, filename);
@@ -44,7 +55,12 @@ export default function Gallery({ posts, loading, isOwner, setPosts }) {
 
   if (posts.length === 0 && !loading) {
     return (
-      <div className="flex h-screen items-start justify-center pt-10   text-sm sm:text-lg md:text-xl font-semibold text-gray-800">
+      <div
+        className={clsx(
+          "flex h-screen items-start justify-center",
+          "pt-10 text-sm sm:text-lg md:text-xl font-semibold text-gray-800",
+        )}
+      >
         No posts found . . .
       </div>
     );
@@ -57,11 +73,11 @@ export default function Gallery({ posts, loading, isOwner, setPosts }) {
     >
       {(loading ? Array.from({ length: 10 }) : posts).map((post, idx) => (
         <Card
-          _id={post?._id}
           key={post?._id || idx}
-          img_url={post?.image}
+          post={post}
+          posts={posts}
           title={post?.content}
-          loading={loading}
+          postLoading={loading}
           isOwner={isOwner}
           isOpen={openMenuId === post?._id}
           onToggle={() =>

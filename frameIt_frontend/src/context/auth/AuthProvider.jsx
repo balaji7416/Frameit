@@ -3,32 +3,32 @@ import { useEffect, useState } from "react";
 import {
   registerUser,
   loginUser,
-  logOutUser,
   checkAuth,
 } from "../../services/auth.service.js";
+
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [initialized, setInitialized] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState(null);
+  const [authInitialized, setAuthInitialized] = useState(false);
 
   const register = async (username, email, password, rememberMe) => {
     try {
-      setLoading(true);
-      setError(null);
-      const { refreshToken, accessToken, user } = await registerUser(
+      setAuthLoading(true);
+      setAuthError(null);
+      const { accessToken: token, user } = await registerUser(
         username,
         email,
         password,
-        rememberMe
+        rememberMe,
       );
 
       // set the tokens in local / session storage
-      if (rememberMe && accessToken) {
-        localStorage.setItem("accessToken", accessToken);
+      if (rememberMe && token) {
+        localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
       } else {
-        sessionStorage.setItem("accessToken", accessToken);
+        sessionStorage.setItem("token", token);
         sessionStorage.setItem("user", JSON.stringify(user));
       }
 
@@ -36,29 +36,29 @@ function AuthProvider({ children }) {
       return user;
     } catch (err) {
       console.log("Register Failed: ", err);
-      setError(err);
+      setAuthError(err);
       throw err;
     } finally {
-      setLoading(false);
+      setAuthLoading(false);
     }
   };
 
   const login = async (email, password, rememberMe) => {
     try {
-      setLoading(true);
-      setError;
-      const { refreshToken, accessToken, user } = await loginUser(
+      setAuthLoading(true);
+      setAuthError;
+      const { accessToken: token, user } = await loginUser(
         email,
         password,
-        rememberMe
+        rememberMe,
       );
 
       // set the tokens in local / session storage
-      if (rememberMe && accessToken) {
-        localStorage.setItem("accessToken", accessToken);
+      if (rememberMe && token) {
+        localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
       } else {
-        sessionStorage.setItem("accessToken", accessToken);
+        sessionStorage.setItem("token", token);
         sessionStorage.setItem("user", JSON.stringify(user));
       }
 
@@ -66,29 +66,29 @@ function AuthProvider({ children }) {
       return user;
     } catch (err) {
       console.log("Login Failed: ", err);
-      setError(err);
+      setAuthError(err);
       throw err;
     } finally {
-      setLoading(false);
+      setAuthLoading(false);
     }
   };
 
   const logout = async () => {
     try {
-      setLoading(true);
-      setError(null);
+      setAuthLoading(true);
+      setAuthError(null);
 
-      // remove the token from local storage
+      // remove the token from local/session storage
       localStorage.clear();
       sessionStorage.clear();
 
       setUser(null);
     } catch (err) {
       console.log("Logout Failed: ", err);
-      setError(err);
+      setAuthError(err);
       throw err;
     } finally {
-      setLoading(false);
+      setAuthLoading(false);
     }
   };
 
@@ -97,14 +97,14 @@ function AuthProvider({ children }) {
       try {
         console.log("Checking auth...");
 
-        const data = checkAuth();
+        const data = await checkAuth();
         setUser(data);
         console.log("Auth check success: ", data);
       } catch (err) {
         setUser(null);
         console.log("Auth check failed: ", err);
       } finally {
-        setInitialized(true);
+        setAuthInitialized(true);
       }
     };
     authInit();
@@ -112,12 +112,12 @@ function AuthProvider({ children }) {
 
   const value = {
     user,
-    loading,
-    error,
+    authLoading,
+    authError,
+    authInitialized,
     register,
     login,
     logout,
-    initialized,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

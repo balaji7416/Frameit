@@ -1,41 +1,52 @@
-import clsx from "clsx";
+// React and core libraries
 import { useEffect } from "react";
 
+// Third-party libraries
+import clsx from "clsx";
+
+//custom hooks / context
 import useAuth from "../context/auth/useAuth.js";
-import Card from "../components/Card.jsx";
 import useGetPosts from "../hooks/useGetPosts.js";
 import useToast from "../context/toast/useToast.js";
-import ToastContainer from "../context/toast/ToastContainer.jsx";
+
+//components
 import Gallery from "../components/Gallery.jsx";
 
 function HomePage() {
-  const { user, initialized } = useAuth();
-  const { posts, setPosts, loading, error } = useGetPosts();
+  //Environment / context
   const { showToast } = useToast();
+  const { user, authInitialized } = useAuth();
 
-  // message box/toast
+  //Data fetching
+  const { posts, setPosts, postsLoading, postsFetchingError } = useGetPosts({});
+
+  // side Effects: Welcome toast on first visit
   useEffect(() => {
-    if (!initialized) return;
+    if (!authInitialized) return;
     const hasWelcomed = sessionStorage.getItem("hasWelcomed");
     if (hasWelcomed) return;
 
     sessionStorage.setItem("hasWelcomed", true);
     showToast("Hello " + (user ? user.username : "Guest") + "!", "success");
-  }, []);
+  }, [authInitialized, user, showToast]);
 
+  // side Effects: postsFetchingError toast
   useEffect(() => {
-    if (error) {
-      showToast(error || "Error fetching posts", "error");
+    if (postsFetchingError) {
+      showToast(
+        postsFetchingError || "postsFetchingError fetching posts",
+        "postsFetchingError",
+      );
     }
-  }, [error]);
+  }, [postsFetchingError, showToast]);
 
   return (
     <div>
       {/* main content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+      <main className={clsx("max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6")}>
         <Gallery
           posts={posts}
-          loading={loading}
+          loading={postsLoading}
           isOwner={false}
           setPosts={setPosts}
         />

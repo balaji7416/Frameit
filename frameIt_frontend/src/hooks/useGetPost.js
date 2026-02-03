@@ -1,28 +1,35 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from "../api/axios.js";
-function useGetPost(postId) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [post, setPost] = useState(null);
+
+function useGetPost(postId, { initialData }) {
+  const [postLoading, setPostLoading] = useState(!initialData);
+  const [postError, setPostError] = useState(null);
+  const [post, setPost] = useState(initialData);
+
+  const hasFetchedRef = useRef(false);
 
   const getPost = async (id) => {
     try {
-      setLoading(true);
+      setPostLoading(true);
       const res = await api.get(`/posts/id/${id}`);
       setPost(res.data.data);
     } catch (err) {
-      setError(err);
-      console.log("error in useGetPost: ", err);
+      setPostError(err);
+      console.log("postError in useGetPost: ", err);
     } finally {
-      setLoading(false);
+      setPostLoading(false);
     }
   };
 
   useEffect(() => {
+    if (initialData && !hasFetchedRef.current) {
+      hasFetchedRef.current = true;
+      return;
+    }
     getPost(postId);
-  }, [postId]);
+  }, [postId, initialData]);
 
-  return { loading, error, post, refetch: () => getPost(postId) };
+  return { postLoading, postError, post, refetch: () => getPost(postId) };
 }
 
 export default useGetPost;

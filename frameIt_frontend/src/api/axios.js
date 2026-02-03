@@ -11,8 +11,7 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token =
-    localStorage.getItem("accessToken") ??
-    sessionStorage.getItem("accessToken");
+    localStorage.getItem("token") ?? sessionStorage.getItem("token");
 
   if (token) {
     config.headers = config.headers || {};
@@ -34,7 +33,7 @@ api.interceptors.response.use(
       window.location.href = "/";
     }
     return Promise.reject(err);
-  }
+  },
 );
 
 export default api;
