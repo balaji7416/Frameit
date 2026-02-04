@@ -1,22 +1,22 @@
-# FrameIt 📸
+# FrameIt
 
-FrameIt is a full‑stack photo‑sharing web app where users can upload, explore, and interact with posts in a clean, modern interface. Think **Instagram‑lite**, but built from scratch to deeply understand real‑world auth, APIs, and frontend architecture.
-
----
-
-## ✨ Features
-
-- 🔐 **Authentication** (Register / Login / Logout)
-- 🧠 **Remember Me** support
-- 🖼️ **Create & View Posts**
-- ❤️ **Like & Comment on Posts**
-- 🔍 **Search Users & Posts**
-- 👤 **User Profiles**
-- 🛡️ **Protected Routes**
+FrameIt is a full‑stack photo‑sharing web app where users can upload, explore, and interact with posts in a clean, modern interface. Think **pintrest‑lite**, but built from scratch to deeply understand real‑world auth, APIs, and frontend architecture.
 
 ---
 
-## 🛠️ Tech Stack
+## Features
+
+- **Authentication** (Register / Login / Logout)
+- **Remember Me** support
+- **Create & View Posts**
+- **Like & Comment on Posts**
+- **Search Users & Posts**
+- **User Profiles**
+- **Protected Routes**
+
+---
+
+## Tech Stack
 
 ### Frontend
 
@@ -40,11 +40,10 @@ FrameIt is a full‑stack photo‑sharing web app where users can upload, explor
 
 ---
 
-## 🔑 Authentication Model
+## Authentication Model
 
 - Uses **JWT‑based authentication**
 - Tokens are stored client‑side
-
   - `sessionStorage` → normal login
   - `localStorage` → when **Remember Me** is enabled
 
@@ -56,7 +55,7 @@ FrameIt is a full‑stack photo‑sharing web app where users can upload, explor
 
 https://frameit-frontend.onrender.com/
 
-## 🚀 Getting Started (Local Setup)
+## Getting Started (Local Setup)
 
 ### 1. Clone the repo
 
@@ -91,36 +90,20 @@ npm run dev
 
 ---
 
-## 📂 Project Structure (Simplified)
-
-```txt
-frameit/
-├── backend/
-│   ├── routes/
-│   ├── controllers/
-│   ├── middleware/
-│   └── models/
-├── frontend/
-│   ├── components/
-│   ├── pages/
-│   ├── context/
-│   └── services/
-```
-
 ---
 
-## 🧪 Why This Project Exists
+## Why This Project Exists
 
 FrameIt was built to:
 
 - Understand **real authentication flows**
 - Handle **CORS, deployment, and API design**
 - Practice **clean frontend architecture**
-- Learn how things break in production (and fix them 👀)
+- Learn how things break in production
 
 ---
 
-## 📌 Future Improvements
+## Future Improvements
 
 - Image optimization
 - Pagination / infinite scroll
@@ -129,12 +112,6 @@ FrameIt was built to:
 
 ---
 
-## 🧠 Author
+## If you like it
 
-Built by **Black** — learning by building, breaking, and rebuilding.
-
----
-
-## ⭐️ If you like it
-
-Drop a star ⭐ and feel free to fork or contribute!
+feel free to fork or contribute!
